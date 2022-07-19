@@ -26,7 +26,7 @@ jobs:
         run: |
           mkdir -p ~/bin
           wget -nc \
-            -o ~/bin/shfmt_v3.5.1_linux_amd64
+            -o ~/bin/shfmt_v3.5.1_linux_amd64 \
             https://github.com/mvdan/sh/releases/download/v3.5.1/shfmt_v3.5.1_linux_amd64
           chmod 755 ~/bin/shfmt*
 
