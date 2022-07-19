@@ -24,6 +24,7 @@ jobs:
 
       - name: install pre-commit and shfmt
         run: |
+          pip3 install -U pre-commit
           mkdir -p ~/bin
           wget -nc \
             -o ~/bin/shfmt \
@@ -32,5 +33,4 @@ jobs:
 
       - name: run pre-commit
         run: |
-          pip3 install -U pre-commit
           PATH=~/bin:$PATH pre-commit run -av
