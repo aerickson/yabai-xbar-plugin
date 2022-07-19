@@ -17,10 +17,19 @@ jobs:
 
       - uses: actions/cache@v3
         with:
-          path: ~/.cache/pre-commit
+          path: 
+            ~/.cache/pre-commit
+            ~/bin
           key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}   
 
-      - name: install and run pre-commit
+      - name: install pre-commit and shfmt
+        run: |
+          wget -nc \
+            -o ~/bin/shfmt_v3.5.1_linux_amd64
+            https://github.com/mvdan/sh/releases/download/v3.5.1/shfmt_v3.5.1_linux_amd64
+          chmod 755 ~/bin/shfmt*
+
+      - name: run pre-commit
         run: |
           pip3 install -U pre-commit
-          pre-commit run -av
+          PATH=~/bin:$PATH pre-commit run -av
