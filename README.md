@@ -1,6 +1,8 @@
 # yabai-xbar-plugin
 A xbar (https://github.com/matryer/xbar) plugin for yabai (https://github.com/koekeishiya/yabai).
 
+![main workflow](https://github.com/aerickson/yabai-xbar-plugin/actions/workflows/main.yml/badge.svg)
+
 ![current look](https://www.evernote.com/shard/s74/sh/eeaa45d0-ac4c-4206-ad00-d2b8134668d7/c83be9265664a23b/res/cb33bda5-4d10-4359-976a-6a01f5dd10e1)
 
 ## features
