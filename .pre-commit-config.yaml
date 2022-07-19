@@ -1,8 +1,22 @@
 repos:
-- repo: https://github.com/pecigonzalo/pre-commit-shfmt
-  rev: v2.1.0
+- repo: https://github.com/jumanjihouse/pre-commit-hooks
+  rev: 2.1.6
   hooks:
-    - id: shell-fmt
+    # - id: bundler-audit
+    # - id: check-mailmap
+    # - id: fasterer
+    # - id: forbid-binary
+    # - id: forbid-space-in-indent
+    # - id: git-check  # Configure in .gitattributes
+    # - id: git-dirty  # Configure in .gitignore
+    # - id: markdownlint # Configure in .mdlrc
+    # - id: reek
+    # - id: require-ascii
+    # - id: rubocop
+    # - id: script-must-have-extension
+    # - id: script-must-not-have-extension
+    # - id: shellcheck
+    - id: shfmt
       args:
-        - -i
-        - "2"
+       - -i
+       - "2"
