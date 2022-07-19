@@ -51,37 +51,37 @@ fi
 # echo "test 123" >&2
 
 # VER=$(yabai --version)
-CURRENT_MODE=$(yabai -m query --spaces --space | jq .type  2>&1)
+CURRENT_MODE=$(yabai -m query --spaces --space | jq .type 2>&1)
 case $CURRENT_MODE in
-  'yabai: connection failed!')
-    CHUNK_STATE='running'
-    MODE=''
-    MODE_TOGGLE='none'
-    MODE_EMOJI="?"
-    ;;
-  '"bsp"')
-    CHUNK_STATE='running'
-    MODE='bsp'
-    MODE_TOGGLE='float'
-    MODE_EMOJI='⊞'
-    ;;
-  '"float"')
-    MODE='float'
-    CHUNK_STATE='running'
-    MODE_TOGGLE='bsp'
-    MODE_EMOJI='⧉'
-    ;;
-  *)
-    echo "$CURRENT_MODE"
-    CHUNK_STATE='stopped'
-    MODE_EMOJI="⧄"
-    ;;
+'yabai: connection failed!')
+  CHUNK_STATE='running'
+  MODE=''
+  MODE_TOGGLE='none'
+  MODE_EMOJI="?"
+  ;;
+'"bsp"')
+  CHUNK_STATE='running'
+  MODE='bsp'
+  MODE_TOGGLE='float'
+  MODE_EMOJI='⊞'
+  ;;
+'"float"')
+  MODE='float'
+  CHUNK_STATE='running'
+  MODE_TOGGLE='bsp'
+  MODE_EMOJI='⧉'
+  ;;
+*)
+  echo "$CURRENT_MODE"
+  CHUNK_STATE='stopped'
+  MODE_EMOJI="⧄"
+  ;;
 esac
 
 #
 # see if ffm plugin is loaded so we can have single FFM menu entry
 #
-PLUGINS_LOADED=$(yabai core::query --plugins loaded  2>&1)
+PLUGINS_LOADED=$(yabai core::query --plugins loaded 2>&1)
 rc=$?
 if [[ $rc -ne 0 ]]; then
   YABAI_PLUGIN_DETECTION_WORKING='no'
@@ -92,14 +92,14 @@ else
 fi
 
 case $PLUGINS_LOADED in
-  *ffm.so*)
-    FFM_ENABLED='yes'
-    echo "DEBUG: FFM_ENABLED='yes'" >&2
-    ;;
-  *)
-    FFM_ENABLED='no'
-    echo "DEBUG: FFM_ENABLED='no'" >&2
-    ;;
+*ffm.so*)
+  FFM_ENABLED='yes'
+  echo "DEBUG: FFM_ENABLED='yes'" >&2
+  ;;
+*)
+  FFM_ENABLED='no'
+  echo "DEBUG: FFM_ENABLED='no'" >&2
+  ;;
 esac
 
 #
@@ -142,10 +142,10 @@ elif [[ "$1" = "efocus-autoraise" ]]; then
 elif [[ "$1" = "efocus-autofocus" ]]; then
   yabai -m config focus_follows_mouse autofocus
   sleep 0.2
-  refreshBB    
+  refreshBB
 elif [[ "$1" = "toggle" ]]; then
   yabai -m space --layout $MODE_TOGGLE
-  refreshBB  
+  refreshBB
 elif [[ "$1" = "equalize" ]]; then
   yabai tiling::desktop --equalize
   refreshBB
@@ -175,11 +175,11 @@ else
         if [[ "$FFM_ENABLED" = "yes" ]]; then
           echo "Disable FFM | bash='$0' param1=dfocus terminal=false"
         else
-          echo "Enable FFM | bash='$0' param1=efocus terminal=false" 
+          echo "Enable FFM | bash='$0' param1=efocus terminal=false"
         fi
       else
-        echo "FFM Autofocus | bash='$0' param1=efocus-autofocus terminal=false" 
-        echo "FFM Autoraise | bash='$0' param1=efocus-autoraise terminal=false" 
+        echo "FFM Autofocus | bash='$0' param1=efocus-autofocus terminal=false"
+        echo "FFM Autoraise | bash='$0' param1=efocus-autoraise terminal=false"
         echo "FFM Off | bash='$0' param1=dfocus terminal=false"
       fi
     fi

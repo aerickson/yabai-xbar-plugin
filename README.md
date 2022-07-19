@@ -13,7 +13,7 @@ A xbar (https://github.com/matryer/xbar) plugin for yabai (https://github.com/ko
 
 ### installation
 
-- install the xbar
+- install xbar
   - https://github.com/matryer/xbar
 - copy plugin to xbar plugin folder
   - `cp yabai_skhd.1s.sh $HOME/Library/Application\ Support/xbar/plugins/`

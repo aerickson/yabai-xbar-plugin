@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: 
+            ~/.cache/pre-commit
+            ~/bin
+          key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}   
+
+      - name: install pre-commit
+        run: |
+          pip3 install -U pre-commit
+          pre-commit --version
+
+      # - name: install shfmt
+      #   run: |
+      #     mkdir -p $HOME/bin
+      #     wget -nc -o ~/bin/shfmt "https://github.com/mvdan/sh/releases/download/v3.5.1/shfmt_v3.5.1_linux_amd64"
+      #     chmod 755 $HOME/bin/shfmt
+      #     PATH=$HOME/bin:$PATH shfmt -version  
+
+      - uses: mfinelli/setup-shfmt@v1
+        with:
+          shfmt-version: 3.5.1
+
+      - name: run pre-commit
+        run: |
+          PATH=$HOME/bin:$PATH pre-commit run -av

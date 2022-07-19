@@ -10,7 +10,7 @@ set -e
 ITERATIONS=$1
 COMMAND=$2
 
-for i in $(seq 1 $ITERATIONS); do	
+for i in $(seq 1 $ITERATIONS); do
   # echo $i
   ${COMMAND} >/dev/null 2>&1
 done
