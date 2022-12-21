@@ -25,7 +25,6 @@ A xbar (https://github.com/matryer/xbar) plugin for yabai (https://github.com/ko
 
 - integrate directions for making the plugin only run on space change, etc
   - https://github.com/SxC97/Yabai-Spaces/wiki/Yabai-and-SHKD-Integration
-- monitor https://github.com/koekeishiya/yabai/issues/1329
 - makefile symlinks vs copies
 
 ### links
