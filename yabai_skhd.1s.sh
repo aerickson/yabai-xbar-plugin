@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# for debugging only
+# set -x
+
 # <xbar.title>yabai helper</xbar.title>
 # <xbar.version>v1.0</xbar.version>
 # <xbar.author>Andrew Erickson</xbar.author>
@@ -51,32 +54,34 @@ fi
 # echo "test 123" >&2
 
 # VER=$(yabai --version)
-CURRENT_MODE=$(yabai -m query --spaces --space | jq .type 2>&1)
-case $CURRENT_MODE in
-'yabai: connection failed!')
-  CHUNK_STATE='running'
-  MODE=''
-  MODE_TOGGLE='none'
-  MODE_EMOJI="?"
-  ;;
-'"bsp"')
-  CHUNK_STATE='running'
-  MODE='bsp'
-  MODE_TOGGLE='float'
-  MODE_EMOJI='⊞'
-  ;;
-'"float"')
-  MODE='float'
-  CHUNK_STATE='running'
-  MODE_TOGGLE='bsp'
-  MODE_EMOJI='⧉'
-  ;;
-*)
-  echo "$CURRENT_MODE"
+SPACE_INFO_CMD=$(yabai -m query --spaces --space 2>&1)
+rc=$?
+if [[ $rc -eq 0 ]]; then
+  CURRENT_MODE=$(echo $SPACE_INFO_CMD | jq .type 2>&1)
+  case $CURRENT_MODE in
+  '"bsp"')
+    CHUNK_STATE='running'
+    MODE='bsp'
+    MODE_TOGGLE='float'
+    MODE_EMOJI='⊞'
+    ;;
+  '"float"')
+    MODE='float'
+    CHUNK_STATE='running'
+    MODE_TOGGLE='bsp'
+    MODE_EMOJI='⧉'
+    ;;
+  *)
+    # echo "$CURRENT_MODE"
+    CHUNK_STATE='stopped'
+    MODE_EMOJI="⧄"
+    ;;
+  esac
+else
+  # echo "$CURRENT_MODE"
   CHUNK_STATE='stopped'
   MODE_EMOJI="⧄"
-  ;;
-esac
+fi
 
 #
 # see if ffm plugin is loaded so we can have single FFM menu entry
@@ -113,6 +118,7 @@ if [[ "$1" = "stop" ]]; then
   refreshBB
 elif [[ "$1" = "start_chunk" ]]; then
   brew services start yabai
+  brew services start skhd
   sleep $SLEEP_TIME
   refreshBB
 elif [[ "$1" = "restart_chunk" ]]; then
