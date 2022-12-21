@@ -21,7 +21,8 @@ FEATURE_SHOW_FFM='yes'
 # can be autofocus or autoraise
 FEATURE_SHOW_FFM_MODE='autofocus'
 FEATURE_SHOW_EQUALIZE='no'
-# TODO: make this work
+# TODO: make these work
+# FEATURE_CONTROL_SKHD_SERVICE  # whether to start/stop skhd when yabai is started/stopped
 # FEATURE_SHOW_DESKTOP_ID='yes'
 
 #############################################################
@@ -83,62 +84,25 @@ else
   MODE_EMOJI="⧄"
 fi
 
-#
-# see if ffm plugin is loaded so we can have single FFM menu entry
-#
-PLUGINS_LOADED=$(yabai core::query --plugins loaded 2>&1)
-rc=$?
-if [[ $rc -ne 0 ]]; then
-  YABAI_PLUGIN_DETECTION_WORKING='no'
-  echo "DEBUG: YABAI_PLUGIN_DETECTION_WORKING no" >&2
-else
-  YABAI_PLUGIN_DETECTION_WORKING='yes'
-  echo "DEBUG: YABAI_PLUGIN_DETECTION_WORKING yes" >&2
-fi
-
-case $PLUGINS_LOADED in
-*ffm.so*)
-  FFM_ENABLED='yes'
-  echo "DEBUG: FFM_ENABLED='yes'" >&2
-  ;;
-*)
-  FFM_ENABLED='no'
-  echo "DEBUG: FFM_ENABLED='no'" >&2
-  ;;
-esac
+FFM_STATE=$(yabai -m config focus_follows_mouse 2>&1)
 
 #
 # command handlers
 #
-# SLEEP_TIME=0.5
 SLEEP_TIME=1
 if [[ "$1" = "stop" ]]; then
   brew services stop yabai
-  brew services stop skhd
   refreshBB
-elif [[ "$1" = "start_chunk" ]]; then
+elif [[ "$1" = "start" ]]; then
   brew services start yabai
-  brew services start skhd
   sleep $SLEEP_TIME
   refreshBB
-elif [[ "$1" = "restart_chunk" ]]; then
+elif [[ "$1" = "restart" ]]; then
   brew services restart yabai
-  # yabai isn't ready for queries right away after restarting, wait a bit
   # sleep $SLEEP_TIME
-  refreshBB
-elif [[ "$1" = "stop_chunk" ]]; then
-  brew services stop yabai
-  refreshBB
-elif [[ "$1" = "restart_both" ]]; then
-  brew services restart yabai
-  brew services restart skhd
   refreshBB
 elif [[ "$1" = "dfocus" ]]; then
   yabai -m config focus_follows_mouse off
-  sleep 0.2
-  refreshBB
-elif [[ "$1" = "efocus" ]]; then
-  yabai -m config focus_follows_mouse "$FEATURE_SHOW_FFM_MODE"
   sleep 0.2
   refreshBB
 elif [[ "$1" = "efocus-autoraise" ]]; then
@@ -153,6 +117,7 @@ elif [[ "$1" = "toggle" ]]; then
   yabai -m space --layout $MODE_TOGGLE
   refreshBB
 elif [[ "$1" = "equalize" ]]; then
+  # TODO: doesn't work. figure out new command.
   yabai tiling::desktop --equalize
   refreshBB
 else
@@ -184,9 +149,16 @@ else
           echo "Enable FFM | bash='$0' param1=efocus terminal=false"
         fi
       else
-        echo "FFM Autofocus | bash='$0' param1=efocus-autofocus terminal=false"
-        echo "FFM Autoraise | bash='$0' param1=efocus-autoraise terminal=false"
-        echo "FFM Off | bash='$0' param1=dfocus terminal=false"
+        echo "FFM: $FFM_STATE"
+        if ([ "$FFM_STATE" = 'disabled' ] || [ "$FFM_STATE" = 'autoraise' ]); then
+          echo "FFM Autofocus | bash='$0' param1=efocus-autofocus terminal=false"
+        fi
+        if ([ "$FFM_STATE" = 'disabled' ] || [ "$FFM_STATE" = 'autofocus' ]); then
+          echo "FFM Autoraise | bash='$0' param1=efocus-autoraise terminal=false"
+        fi
+        if ([ "$FFM_STATE" = 'autofocus' ] || [ "$FFM_STATE" = 'autoraise' ]); then
+          echo "FFM Off | bash='$0' param1=dfocus terminal=false"
+        fi
       fi
     fi
     echo "---"
@@ -194,10 +166,10 @@ else
 
   echo "yabai: $CHUNK_STATE"
   if [[ "$CHUNK_STATE" = "running" ]]; then
-    echo "Restart yabai | bash='$0' param1=restart_chunk terminal=false"
-    echo "Stop yabai | bash='$0' param1=stop_chunk terminal=false"
+    echo "Restart yabai | bash='$0' param1=restart terminal=false"
+    echo "Stop yabai | bash='$0' param1=stop terminal=false"
   else
-    echo "Start yabai | bash='$0' param1=start_chunk terminal=false"
+    echo "Start yabai | bash='$0' param1=start terminal=false"
   fi
   # TODO: add back in control of skhd? behind a flag or option?
 

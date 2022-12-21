@@ -11,7 +11,9 @@ A xbar (https://github.com/matryer/xbar) plugin for yabai (https://github.com/ko
 - indicates current mission control space
 - indicates current desktop mode
   - allows toggling between bsp and float on current desktop
-- allows togging of Focus Follows Mouse (FFM)
+- indicates Focus Follows Mouse (FFM) mode
+  - allows togging of FFM modes
+- allows starting/stopping/restarting yabai
 
 ### installation
 
