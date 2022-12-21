@@ -34,6 +34,9 @@ jobs:
       #     chmod 755 $HOME/bin/shfmt
       #     PATH=$HOME/bin:$PATH shfmt -version  
 
+      # TODO: install and run shellcheck (via pre-commit)
+      # https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz
+
       - uses: mfinelli/setup-shfmt@v1
         with:
           shfmt-version: 3.5.1
