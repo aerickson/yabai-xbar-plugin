@@ -91,18 +91,23 @@ FFM_STATE=$(yabai -m config focus_follows_mouse 2>&1)
 #
 SLEEP_TIME=1
 if [[ "$1" = "stop" ]]; then
-  launchctl stop com.koekeishiya.yabai
-  launchctl stop com.koekeishiya.skhd
+  # launchctl stop com.koekeishiya.yabai
+  # launchctl stop com.koekeishiya.skhd
+  skhd --stop-service
+  yabai --stop-service
   refreshBB
 elif [[ "$1" = "start" ]]; then
-  launchctl start com.koekeishiya.yabai
+  # launchctl start com.koekeishiya.yabai
+  yabai --start-service
+  skhd --start-service
   sleep $SLEEP_TIME
   refreshBB
 elif [[ "$1" = "restart" ]]; then
-  launchctl stop com.koekeishiya.yabai
-  sleep 1
-  launchctl start com.koekeishiya.yabai
-  # sleep $SLEEP_TIME
+  # launchctl stop com.koekeishiya.yabai
+  # launchctl start com.koekeishiya.yabai
+  yabai --restart-service
+  skhd --restart-service
+  sleep $SLEEP_TIME
   refreshBB
 elif [[ "$1" = "dfocus" ]]; then
   yabai -m config focus_follows_mouse off
