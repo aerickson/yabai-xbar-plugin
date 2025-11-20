@@ -1,5 +1,7 @@
 # yabai-xbar-plugin
-A xbar (https://github.com/matryer/xbar) plugin for yabai (https://github.com/koekeishiya/yabai).
+A yabai plugin for yabai (https://github.com/koekeishiya/yabai) for Bitbar/xbar/SwiftBar.
+
+Bitbar and xbar are not maintained. Use with SwiftBar. `brew install swiftbar`
 
 ![main workflow](https://github.com/aerickson/yabai-xbar-plugin/actions/workflows/main.yml/badge.svg)
 
