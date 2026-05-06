@@ -37,6 +37,9 @@ function refreshBB {
 
 export PATH=/usr/local/bin:/opt/homebrew/bin:$PATH
 
+# Resolve symlink so the path used in bash= menu params has no spaces
+SELF=$(readlink "$0" || echo "$0")
+
 #
 # verify feature flag settings
 #
@@ -137,9 +140,9 @@ else
   if [[ "$CHUNK_STATE" = "running" ]]; then
     # TODO: selector for all 3 modes?
     echo "Desktop Mode: ${MODE}"
-    echo "Toggle Layout | bash='$0' param1=toggle terminal=false"
+    echo "Toggle Layout | bash='$SELF' param1=toggle terminal=false"
     if [[ "$FEATURE_SHOW_EQUALIZE" == 'yes' ]]; then
-      echo "Equalize Windows | bash='$0' param1=equalize terminal=false"
+      echo "Equalize Windows | bash='$SELF' param1=equalize terminal=false"
     fi
 
     # focus follow mouse code
@@ -147,20 +150,20 @@ else
       echo "---"
       if [[ "$YABAI_PLUGIN_DETECTION_WORKING" == "yes" ]]; then
         if [[ "$FFM_ENABLED" = "yes" ]]; then
-          echo "Disable FFM | bash='$0' param1=dfocus terminal=false"
+          echo "Disable FFM | bash='$SELF' param1=dfocus terminal=false"
         else
-          echo "Enable FFM | bash='$0' param1=efocus terminal=false"
+          echo "Enable FFM | bash='$SELF' param1=efocus terminal=false"
         fi
       else
         echo "FFM: $FFM_STATE"
         if ([ "$FFM_STATE" = 'disabled' ] || [ "$FFM_STATE" = 'autoraise' ]); then
-          echo "FFM Autofocus | bash='$0' param1=efocus-autofocus terminal=false"
+          echo "FFM Autofocus | bash='$SELF' param1=efocus-autofocus terminal=false"
         fi
         if ([ "$FFM_STATE" = 'disabled' ] || [ "$FFM_STATE" = 'autofocus' ]); then
-          echo "FFM Autoraise | bash='$0' param1=efocus-autoraise terminal=false"
+          echo "FFM Autoraise | bash='$SELF' param1=efocus-autoraise terminal=false"
         fi
         if ([ "$FFM_STATE" = 'autofocus' ] || [ "$FFM_STATE" = 'autoraise' ]); then
-          echo "FFM Off | bash='$0' param1=dfocus terminal=false"
+          echo "FFM Off | bash='$SELF' param1=dfocus terminal=false"
         fi
       fi
     fi
@@ -169,10 +172,10 @@ else
 
   echo "yabai: $CHUNK_STATE"
   if [[ "$CHUNK_STATE" = "running" ]]; then
-    echo "Restart yabai | bash='$0' param1=restart terminal=false"
-    echo "Stop yabai | bash='$0' param1=stop terminal=false"
+    echo "Restart yabai | bash='$SELF' param1=restart terminal=false"
+    echo "Stop yabai | bash='$SELF' param1=stop terminal=false"
   else
-    echo "Start yabai | bash='$0' param1=start terminal=false"
+    echo "Start yabai | bash='$SELF' param1=start terminal=false"
   fi
   # TODO: add back in control of skhd? behind a flag or option?
 
