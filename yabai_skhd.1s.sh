@@ -22,7 +22,6 @@ FEATURE_SHOW_FFM='yes'
 FEATURE_SHOW_FFM_MODE='autofocus'
 FEATURE_SHOW_EQUALIZE='no'
 # TODO: make these work
-# FEATURE_CONTROL_SKHD_SERVICE  # whether to start/stop skhd when yabai is started/stopped
 # FEATURE_SHOW_DESKTOP_ID='yes'
 
 #############################################################
@@ -103,6 +102,50 @@ function restart_services {
   return $rc
 }
 
+function wait_for_skhd {
+  local target="$1"
+  local attempts=20
+  local delay=0.25
+  local i=0
+
+  while [[ $i -lt $attempts ]]; do
+    pgrep -x skhd >/dev/null 2>&1
+    local rc=$?
+    if [[ "$target" = "up" && $rc -eq 0 ]]; then
+      return 0
+    fi
+    if [[ "$target" = "down" && $rc -ne 0 ]]; then
+      return 0
+    fi
+    sleep "$delay"
+    i=$((i + 1))
+  done
+
+  return 1
+}
+
+function stop_skhd {
+  local rc=0
+  run_cmd skhd --stop-service || rc=1
+  wait_for_skhd down || rc=1
+  return $rc
+}
+
+function start_skhd {
+  local rc=0
+  run_cmd skhd --start-service || rc=1
+  wait_for_skhd up || rc=1
+  return $rc
+}
+
+function restart_skhd {
+  local rc=0
+  log_msg "skhd restart requested"
+  run_cmd skhd --restart-service || rc=1
+  wait_for_skhd up || rc=1
+  return $rc
+}
+
 #
 # verify feature flag settings
 #
@@ -144,13 +187,18 @@ if [[ $rc -eq 0 ]]; then
     MODE_EMOJI="⧄"
     ;;
   esac
+  FFM_STATE=$(yabai -m config focus_follows_mouse 2>&1)
 else
   # echo "$CURRENT_MODE"
   CHUNK_STATE='stopped'
   MODE_EMOJI="⧄"
 fi
 
-FFM_STATE=$(yabai -m config focus_follows_mouse 2>&1)
+if pgrep -x skhd &>/dev/null; then
+  SKHD_STATE='running'
+else
+  SKHD_STATE='stopped'
+fi
 
 #
 # command handlers
@@ -176,6 +224,29 @@ elif [[ "$1" = "restart" ]]; then
     set_status "Restarted yabai/skhd"
   else
     set_status "Restart may have failed; see $ACTION_LOG"
+  fi
+  sleep $SLEEP_TIME
+  refreshBB
+elif [[ "$1" = "skhd-stop" ]]; then
+  if stop_skhd; then
+    set_status "Stopped skhd"
+  else
+    set_status "Stop skhd may have failed; see $ACTION_LOG"
+  fi
+  refreshBB
+elif [[ "$1" = "skhd-start" ]]; then
+  if start_skhd; then
+    set_status "Started skhd"
+  else
+    set_status "Start skhd may have failed; see $ACTION_LOG"
+  fi
+  sleep $SLEEP_TIME
+  refreshBB
+elif [[ "$1" = "skhd-restart" ]]; then
+  if restart_skhd; then
+    set_status "Restarted skhd"
+  else
+    set_status "Restart skhd may have failed; see $ACTION_LOG"
   fi
   sleep $SLEEP_TIME
   refreshBB
@@ -248,11 +319,18 @@ else
     echo "Action log: $ACTION_LOG"
   fi
   if [[ "$CHUNK_STATE" = "running" ]]; then
-    echo "Restart yabai | bash='$SELF' param1=restart terminal=false"
-    echo "Stop yabai | bash='$SELF' param1=stop terminal=false"
+    echo "Restart yabai/skhd | bash='$SELF' param1=restart terminal=false"
+    echo "Stop yabai/skhd | bash='$SELF' param1=stop terminal=false"
   else
-    echo "Start yabai | bash='$SELF' param1=start terminal=false"
+    echo "Start yabai/skhd | bash='$SELF' param1=start terminal=false"
   fi
-  # TODO: add back in control of skhd? behind a flag or option?
+  echo "---"
+  echo "skhd: $SKHD_STATE"
+  if [[ "$SKHD_STATE" = "running" ]]; then
+    echo "Restart skhd | bash='$SELF' param1=skhd-restart terminal=false"
+    echo "Stop skhd | bash='$SELF' param1=skhd-stop terminal=false"
+  else
+    echo "Start skhd | bash='$SELF' param1=skhd-start terminal=false"
+  fi
 
 fi
