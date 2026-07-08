@@ -30,15 +30,78 @@ FEATURE_SHOW_EQUALIZE='no'
 #############################################################
 
 function refreshBB {
-  open -g 'xbar://app.xbarapp.com/refreshPlugin?name=yabai.*?.sh'
-  # backup plan: update all
-  # open -g 'xbar://app.xbarapp.com/refreshAllPlugins'
+  open -g 'swiftbar://app.swiftbarapp.com/refreshPlugin?name=yabai.*?.sh' >/dev/null 2>&1
+  open -g 'xbar://app.xbarapp.com/refreshPlugin?name=yabai.*?.sh' >/dev/null 2>&1
 }
 
 export PATH=/usr/local/bin:/opt/homebrew/bin:$PATH
+ACTION_LOG="/tmp/yabai_xbar_plugin.log"
+ACTION_STATUS="/tmp/yabai_xbar_plugin.status"
 
 # Resolve symlink so the path used in bash= menu params has no spaces
 SELF=$(readlink "$0" || echo "$0")
+
+function log_msg {
+  echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >>"$ACTION_LOG"
+}
+
+function set_status {
+  echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >"$ACTION_STATUS"
+}
+
+function run_cmd {
+  log_msg "+ $*"
+  "$@" >>"$ACTION_LOG" 2>&1
+  local rc=$?
+  log_msg "rc=$rc $*"
+  return $rc
+}
+
+function wait_for_yabai {
+  local target="$1"
+  local attempts=20
+  local delay=0.25
+  local i=0
+
+  while [[ $i -lt $attempts ]]; do
+    yabai -m query --spaces --space >/dev/null 2>&1
+    local rc=$?
+    if [[ "$target" = "up" && $rc -eq 0 ]]; then
+      return 0
+    fi
+    if [[ "$target" = "down" && $rc -ne 0 ]]; then
+      return 0
+    fi
+    sleep "$delay"
+    i=$((i + 1))
+  done
+
+  return 1
+}
+
+function stop_services {
+  local rc=0
+  run_cmd skhd --stop-service || rc=1
+  run_cmd yabai --stop-service || rc=1
+  wait_for_yabai down || rc=1
+  return $rc
+}
+
+function start_services {
+  local rc=0
+  run_cmd yabai --start-service || rc=1
+  wait_for_yabai up || rc=1
+  run_cmd skhd --start-service || rc=1
+  return $rc
+}
+
+function restart_services {
+  local rc=0
+  log_msg "restart requested"
+  stop_services || rc=1
+  start_services || rc=1
+  return $rc
+}
 
 #
 # verify feature flag settings
@@ -94,17 +157,26 @@ FFM_STATE=$(yabai -m config focus_follows_mouse 2>&1)
 #
 SLEEP_TIME=1
 if [[ "$1" = "stop" ]]; then
-  skhd --stop-service
-  yabai --stop-service
+  if stop_services; then
+    set_status "Stopped yabai/skhd"
+  else
+    set_status "Stop may have failed; see $ACTION_LOG"
+  fi
   refreshBB
 elif [[ "$1" = "start" ]]; then
-  yabai --start-service
-  skhd --start-service
+  if start_services; then
+    set_status "Started yabai/skhd"
+  else
+    set_status "Start may have failed; see $ACTION_LOG"
+  fi
   sleep $SLEEP_TIME
   refreshBB
 elif [[ "$1" = "restart" ]]; then
-  yabai --restart-service
-  skhd --restart-service
+  if restart_services; then
+    set_status "Restarted yabai/skhd"
+  else
+    set_status "Restart may have failed; see $ACTION_LOG"
+  fi
   sleep $SLEEP_TIME
   refreshBB
 elif [[ "$1" = "dfocus" ]]; then
@@ -171,6 +243,10 @@ else
   fi
 
   echo "yabai: $CHUNK_STATE"
+  if [[ -f "$ACTION_STATUS" ]]; then
+    echo "Last action: $(tail -n 1 "$ACTION_STATUS")"
+    echo "Action log: $ACTION_LOG"
+  fi
   if [[ "$CHUNK_STATE" = "running" ]]; then
     echo "Restart yabai | bash='$SELF' param1=restart terminal=false"
     echo "Stop yabai | bash='$SELF' param1=stop terminal=false"
