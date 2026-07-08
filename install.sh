@@ -3,14 +3,11 @@
 set -euo pipefail
 
 PLUGIN="yabai_skhd.1s.sh"
-XBAR_PLUGIN_DIR="$HOME/Library/Application Support/xbar/plugins"
+SWIFTBAR_PLUGIN_DIR="$HOME/.swiftbar"
 SRC="$(cd "$(dirname "$0")" && pwd)/$PLUGIN"
-DST="$XBAR_PLUGIN_DIR/$PLUGIN"
+DST="$SWIFTBAR_PLUGIN_DIR/$PLUGIN"
 
-if [[ ! -d "$XBAR_PLUGIN_DIR" ]]; then
-  echo "xbar plugins directory not found: $XBAR_PLUGIN_DIR"
-  exit 1
-fi
+mkdir -p "$SWIFTBAR_PLUGIN_DIR"
 
 if [[ -e "$DST" && ! -L "$DST" ]]; then
   echo "A non-symlink file already exists at $DST"
@@ -21,3 +18,4 @@ fi
 ln -sf "$SRC" "$DST"
 chmod +x "$SRC"
 echo "Installed: $DST -> $SRC"
+open -g 'swiftbar://app.swiftbarapp.com/refreshPlugin?name=yabai.*?.sh' >/dev/null 2>&1 || true

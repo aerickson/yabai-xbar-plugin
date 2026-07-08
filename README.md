@@ -19,17 +19,21 @@ Bitbar and xbar are not maintained. Use with SwiftBar. `brew install swiftbar`
 
 ### installation
 
-- install xbar
-  - https://github.com/matryer/xbar
-- copy plugin to xbar plugin folder
-  - `cp yabai_skhd.1s.sh $HOME/Library/Application\ Support/xbar/plugins/`
+- install SwiftBar
+  - `brew install swiftbar`
+- install the plugin into `~/.swiftbar`
+  - `./install.sh`
   - or run `make deploy`
+- set SwiftBar to use `~/.swiftbar`
+  - open SwiftBar from the menu bar
+  - open Preferences/Settings and choose the plugin folder/location
+  - select `~/.swiftbar`
+  - if the file picker does not show hidden folders, press `Cmd+Shift+G`, enter `~/.swiftbar`, and select it
 
 ### TODO
 
 - integrate directions for making the plugin only run on space change, etc
   - https://github.com/SxC97/Yabai-Spaces/wiki/Yabai-and-SHKD-Integration
-- makefile symlinks vs copies
 
 ### links
 
