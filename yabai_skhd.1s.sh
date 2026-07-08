@@ -30,7 +30,9 @@ FEATURE_SHOW_EQUALIZE='no'
 
 function refreshBB {
   open -g 'swiftbar://app.swiftbarapp.com/refreshPlugin?name=yabai.*?.sh' >/dev/null 2>&1
-  open -g 'xbar://app.xbarapp.com/refreshPlugin?name=yabai.*?.sh' >/dev/null 2>&1
+  if [[ "${YABAI_XBAR_REFRESH_LEGACY:-no}" = "yes" ]]; then
+    open -g 'xbar://app.xbarapp.com/refreshPlugin?name=yabai.*?.sh' >/dev/null 2>&1
+  fi
 }
 
 export PATH=/usr/local/bin:/opt/homebrew/bin:$PATH
