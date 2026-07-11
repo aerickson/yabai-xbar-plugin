@@ -83,6 +83,7 @@ function wait_for_yabai {
 function stop_services {
   local rc=0
   run_cmd skhd --stop-service || rc=1
+  wait_for_skhd down || rc=1
   run_cmd yabai --stop-service || rc=1
   wait_for_yabai down || rc=1
   return $rc
@@ -93,6 +94,7 @@ function start_services {
   run_cmd yabai --start-service || rc=1
   wait_for_yabai up || rc=1
   run_cmd skhd --start-service || rc=1
+  wait_for_skhd up || rc=1
   return $rc
 }
 
